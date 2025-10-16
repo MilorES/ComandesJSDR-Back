@@ -24,4 +24,7 @@ docker compose up --build -d
 
 # Veure logs
 docker compose logs -f comandesapi
+
+# Aturar i eliminar contenidors
+docker compose down
 ```
