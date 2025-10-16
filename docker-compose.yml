@@ -1,0 +1,58 @@
+services:
+  mariadb:
+    image: mariadb:10.6
+    container_name: comandes_mariadb
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "${MYSQL_PORT}:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  comandesapi:
+    build:
+      context: .
+      dockerfile: ComandesAPI/Dockerfile
+    image: comandesapi:local
+    depends_on:
+      - mariadb
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=mariadb
+      - DB_NAME=${MYSQL_DATABASE}
+      - DB_USER=${MYSQL_USER}
+      - DB_PASS=${MYSQL_PASSWORD}
+      - DB_PORT=${MYSQL_PORT}
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "5000:80"
+    restart: unless-stopped
+
+  migrate:
+    image: mcr.microsoft.com/dotnet/sdk:9.0
+    container_name: comandes_migrate
+    depends_on:
+      - mariadb
+    env_file:
+      - .env
+    working_dir: /src
+    volumes:
+      - ./:/src:delegated
+    # Instal·lar l'eina dotnet-ef i executeu migracions contra la base de dades definida a .env
+    command: "/bin/bash -lc 'dotnet tool install --global dotnet-ef --version 9.* || true && export PATH=\"$PATH:/root/.dotnet/tools\" && dotnet ef database update --project ComandesAPI/ComandesAPI.csproj --startup-project ComandesAPI/ComandesAPI.csproj'"
+
+
+volumes:
+  db_data:
