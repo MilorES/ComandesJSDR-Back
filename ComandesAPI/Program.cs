@@ -3,6 +3,21 @@ using ComandesAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 🔹 Configure CORS to allow requests from the frontend
+// This block allows the frontend at http://localhost:5173
+// to communicate with the API without being blocked by CORS
+
+var MyAllowFrontend = "_myAllowFrontend";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowFrontend, policy =>
+    {
+        policy.WithOrigins("http://localhost:5173") 
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // Add services to the container.
 builder.Services.AddControllers();
 
@@ -10,7 +25,6 @@ builder.Services.AddControllers();
 // otherwise fall back to appsettings.json connection string.
 string? dockerConn = null;
 {
-    // Common Docker environment variable names. Docker Compose can set these.
     var host = Environment.GetEnvironmentVariable("DB_HOST");
     var name = Environment.GetEnvironmentVariable("DB_NAME");
     var user = Environment.GetEnvironmentVariable("DB_USER");
@@ -19,11 +33,9 @@ string? dockerConn = null;
     if (!string.IsNullOrWhiteSpace(host) && !string.IsNullOrWhiteSpace(name) &&
         !string.IsNullOrWhiteSpace(user) && !string.IsNullOrWhiteSpace(pass))
     {
-        // Build a MySQL connection string
         dockerConn = $"Server={host};Database={name};User={user};Password={pass};";
     }
 
-    // Also allow passing the full connection string via ConnectionStrings__DefaultConnection
     var overrideFull = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
     if (!string.IsNullOrWhiteSpace(overrideFull)) dockerConn = overrideFull;
 }
@@ -57,16 +69,8 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "API de Comandes JDSR v1");
-        c.RoutePrefix = "swagger"; // Serve Swagger UI at /swagger
-    });
-}
+// 🔹 Habilitar CORS (antes de UseAuthorization)
+app.UseCors(MyAllowFrontend);
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
@@ -75,21 +79,20 @@ app.MapControllers();
 // Redirect root to Swagger UI when in Development or Swagger is enabled
 app.MapGet("/", () => Results.Redirect("/swagger", permanent: false));
 
-// Apply EF Core migrations automatically on startup (development-friendly).
-// This will create/update the database schema according to the Migrations folder.
+// Apply EF Core migrations automatically on startup (development-friendly)
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
-        var db = services.GetRequiredService<ComandesAPI.Data.ComandesDbContext>();
+        var db = services.GetRequiredService<ComandesDbContext>();
         db.Database.Migrate();
+
     }
     catch (Exception ex)
     {
         var logger = services.GetService<ILoggerFactory>()?.CreateLogger("Program");
         logger?.LogError(ex, "An error occurred while migrating or initializing the database.");
-        // In production you might want to rethrow or handle differently
     }
 }
 
