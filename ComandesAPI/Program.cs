@@ -3,16 +3,14 @@ using ComandesAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 🔹 Configure CORS to allow requests from the frontend
-// This block allows the frontend at http://localhost:5173
-// to communicate with the API without being blocked by CORS
-
+// Configurar CORS para permitir peticiones desde el frontend
 var MyAllowFrontend = "_myAllowFrontend";
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowFrontend, policy =>
     {
-        policy.WithOrigins("http://localhost:5173") 
+        policy.WithOrigins("http://localhost:5173") // URL de tu frontend
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -21,8 +19,7 @@ builder.Services.AddCors(options =>
 // Add services to the container.
 builder.Services.AddControllers();
 
-// Build connection string from Docker environment variables when provided,
-// otherwise fall back to appsettings.json connection string.
+// Build connection string (Docker o appsettings.json)
 string? dockerConn = null;
 {
     var host = Environment.GetEnvironmentVariable("DB_HOST");
@@ -69,17 +66,28 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// 🔹 Habilitar CORS (antes de UseAuthorization)
+// Habilitar CORS
 app.UseCors(MyAllowFrontend);
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "API de Comandes JDSR v1");
+        c.RoutePrefix = "swagger";
+    });
+}
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-// Redirect root to Swagger UI when in Development or Swagger is enabled
+// Redirect root to Swagger UI
 app.MapGet("/", () => Results.Redirect("/swagger", permanent: false));
 
-// Apply EF Core migrations automatically on startup (development-friendly)
+// Aplicar migraciones automáticamente
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -88,6 +96,13 @@ using (var scope = app.Services.CreateScope())
         var db = services.GetRequiredService<ComandesDbContext>();
         db.Database.Migrate();
 
+        // 🔹 Actualizar automáticamente Actiu = false si Estoc = 0
+        var outOfStock = db.Articles.Where(a => a.Estoc == 0).ToList();
+        foreach (var article in outOfStock)
+        {
+            article.Actiu = false;
+        }
+        db.SaveChanges();
     }
     catch (Exception ex)
     {
