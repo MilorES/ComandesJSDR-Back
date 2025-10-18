@@ -1,10 +1,47 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using ComandesAPI.Data;
+using ComandesAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+// Registrar serveis d'autenticació
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+// Configurar autenticació JWT
+var jwtSecretKey = builder.Configuration["Jwt:SecretKey"];
+if (string.IsNullOrEmpty(jwtSecretKey))
+{
+    throw new InvalidOperationException("La clau secreta JWT no està configurada. Afegiu 'Jwt:SecretKey' a appsettings.json");
+}
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey)),
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+builder.Services.AddAuthorization();
 
 // Build connection string from Docker environment variables when provided,
 // otherwise fall back to appsettings.json connection string.
@@ -53,6 +90,31 @@ builder.Services.AddSwaggerGen(c =>
             Email = "info@jdsr.com"
         }
     });
+
+    // Configurar autenticació JWT a Swagger
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Description = "Autenticació JWT. Introduïu 'Bearer' seguit del token. Exemple: 'Bearer {token}'",
+        Name = "Authorization",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
 });
 
 var app = builder.Build();
@@ -67,29 +129,42 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = "swagger"; // Serve Swagger UI at /swagger
     });
 }
+else
+{
+    // Només redirigir a HTTPS en producció
+    app.UseHttpsRedirection();
+}
 
-app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
 // Redirect root to Swagger UI when in Development or Swagger is enabled
 app.MapGet("/", () => Results.Redirect("/swagger", permanent: false));
 
-// Apply EF Core migrations automatically on startup (development-friendly).
-// This will create/update the database schema according to the Migrations folder.
+// Aplicar migracions d'EF Core automàticament a l'inici.
+// Database.Migrate() crearà la base de dades si no existeix i aplicarà
+// totes les migracions pendents automàticament.
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var logger = services.GetService<ILoggerFactory>()?.CreateLogger("Program");
+
     try
     {
         var db = services.GetRequiredService<ComandesAPI.Data.ComandesDbContext>();
+
+        logger?.LogInformation("Comprovant migracions de base de dades...");
+
+        // Migrate() crearà la BD si no existeix i aplicarà migracions pendents
         db.Database.Migrate();
+
+        logger?.LogInformation("Base de dades actualitzada correctament.");
     }
     catch (Exception ex)
     {
-        var logger = services.GetService<ILoggerFactory>()?.CreateLogger("Program");
-        logger?.LogError(ex, "An error occurred while migrating or initializing the database.");
-        // In production you might want to rethrow or handle differently
+        logger?.LogError(ex, "S'ha produït un error en migrar o inicialitzar la base de dades.");
+        throw; // Relançar per evitar que l'aplicació s'iniciï amb errors de BD
     }
 }
 

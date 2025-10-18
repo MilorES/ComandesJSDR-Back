@@ -41,6 +41,31 @@ namespace ComandesAPI.Migrations
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
+            migrationBuilder.CreateTable(
+                name: "Usuaris",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Username = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PasswordHash = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    FullName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Email = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Role = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false, defaultValue: "User")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    IsEnabled = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Usuaris", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
             migrationBuilder.InsertData(
                 table: "Articles",
                 columns: new[] { "Id", "Actiu", "Categoria", "DataCreacio", "DataModificacio", "Descripcio", "Estoc", "Nom", "Preu" },
@@ -58,6 +83,15 @@ namespace ComandesAPI.Migrations
                     { 10, true, "Informàtica", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Càmera web Full HD 1080p amb micròfon integrat", 18, "Webcam HD", 45.99m }
                 });
 
+            migrationBuilder.InsertData(
+                table: "Usuaris",
+                columns: new[] { "Id", "CreatedAt", "Email", "FullName", "IsEnabled", "PasswordHash", "Role", "Username" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@comandesjdsr.com", "Administrador del Sistema", true, "$2a$12$wKQgs3QYMJdHm791BDWZ7eJCndZsZAvQYcbBQ9UCEs.sFP6Hp1LOW", "Administrator", "administrador" },
+                    { 2, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "usuari@comandesjdsr.com", "Usuari Estàndard", true, "$2a$12$wKQgs3QYMJdHm791BDWZ7eJCndZsZAvQYcbBQ9UCEs.sFP6Hp1LOW", "User", "usuari" }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Articles_Categoria",
                 table: "Articles",
@@ -67,6 +101,18 @@ namespace ComandesAPI.Migrations
                 name: "IX_Articles_Nom",
                 table: "Articles",
                 column: "Nom");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Usuaris_Email",
+                table: "Usuaris",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Usuaris_Username",
+                table: "Usuaris",
+                column: "Username",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -74,6 +120,9 @@ namespace ComandesAPI.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Articles");
+
+            migrationBuilder.DropTable(
+                name: "Usuaris");
         }
     }
 }

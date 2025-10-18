@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ComandesAPI.Data;
@@ -8,6 +9,7 @@ namespace ComandesAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize] // Requereix autenticació per a tots els endpoints
     public class ArticlesController : ControllerBase
     {
         private readonly ComandesDbContext _context;
@@ -24,11 +26,13 @@ namespace ComandesAPI.Controllers
         /// </summary>
         /// <param name="categoria">Filtre opcional per categoria</param>
         /// <param name="actius">Filtre opcional per articles actius</param>
+        /// <param name="ambEstoc">Filtre opcional per excloure articles amb estoc <= 0</param>
         /// <returns>Llista d'articles</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ArticleDto>>> GetArticles(
             [FromQuery] string? categoria = null,
-            [FromQuery] bool? actius = null)
+            [FromQuery] bool? actius = null,
+            [FromQuery] bool? ambEstoc = null)
         {
             try
             {
@@ -42,6 +46,11 @@ namespace ComandesAPI.Controllers
                 if (actius.HasValue)
                 {
                     query = query.Where(a => a.Actiu == actius.Value);
+                }
+
+                if (ambEstoc.HasValue && ambEstoc.Value)
+                {
+                    query = query.Where(a => a.Estoc > 0);
                 }
 
                 var articles = await query

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ComandesAPI.Migrations
 {
     [DbContext(typeof(ComandesDbContext))]
-    [Migration("20251012202120_InitialCreate")]
+    [Migration("20251018163131_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -183,6 +183,85 @@ namespace ComandesAPI.Migrations
                             Estoc = 18,
                             Nom = "Webcam HD",
                             Preu = 45.99m
+                        });
+                });
+
+            modelBuilder.Entity("ComandesAPI.Models.Usuari", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<bool>("IsEnabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasDefaultValue("User");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Usuaris_Email");
+
+                    b.HasIndex("Username")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Usuaris_Username");
+
+                    b.ToTable("Usuaris");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "admin@comandesjdsr.com",
+                            FullName = "Administrador del Sistema",
+                            IsEnabled = true,
+                            PasswordHash = "$2a$12$wKQgs3QYMJdHm791BDWZ7eJCndZsZAvQYcbBQ9UCEs.sFP6Hp1LOW",
+                            Role = "Administrator",
+                            Username = "administrador"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "usuari@comandesjdsr.com",
+                            FullName = "Usuari Estàndard",
+                            IsEnabled = true,
+                            PasswordHash = "$2a$12$wKQgs3QYMJdHm791BDWZ7eJCndZsZAvQYcbBQ9UCEs.sFP6Hp1LOW",
+                            Role = "User",
+                            Username = "usuari"
                         });
                 });
 #pragma warning restore 612, 618
