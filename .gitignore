@@ -55,5 +55,7 @@ CodeCoverage/
 TestResult.xml
 nunit-*.xml
 
-# Environment variables
+# Environment variables and sensitive configuration
 .env
+appsettings.Development.json
+**/appsettings.*.local.json

@@ -14,12 +14,51 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+// Configurar CORS segons entorn
+// Prioritat: Variable d'entorn CORS_ALLOWED_ORIGINS (separats per comes) > appsettings
+var corsEnvVar = Environment.GetEnvironmentVariable("CORS_ALLOWED_ORIGINS");
+var allowedOrigins = !string.IsNullOrEmpty(corsEnvVar)
+    ? corsEnvVar.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+    : builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+
+var allowAnyOrigin = allowedOrigins.Length == 0 || allowedOrigins.Contains("*");
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DefaultCorsPolicy", policyBuilder =>
+    {
+        if (allowAnyOrigin)
+        {
+            policyBuilder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+        }
+        else
+        {
+            policyBuilder.WithOrigins(allowedOrigins)
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials();
+        }
+    });
+});
+
 // Configurar autenticació JWT
-var jwtSecretKey = builder.Configuration["Jwt:SecretKey"];
+// En producció, usar variables d'entorn per a informació sensible
+var jwtSecretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY")
+                   ?? builder.Configuration["Jwt:SecretKey"];
+
 if (string.IsNullOrEmpty(jwtSecretKey))
 {
-    throw new InvalidOperationException("La clau secreta JWT no està configurada. Afegiu 'Jwt:SecretKey' a appsettings.json");
+    throw new InvalidOperationException(
+        "La clau secreta JWT no està configurada. " +
+        "Configureu la variable d'entorn 'JWT_SECRET_KEY' o afegiu 'Jwt:SecretKey' a appsettings.json");
 }
+
+var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER")
+                ?? builder.Configuration["Jwt:Issuer"];
+var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE")
+                  ?? builder.Configuration["Jwt:Audience"];
 
 builder.Services.AddAuthentication(options =>
 {
@@ -33,9 +72,9 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey)),
         ValidateIssuer = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidIssuer = jwtIssuer,
         ValidateAudience = true,
-        ValidAudience = builder.Configuration["Jwt:Audience"],
+        ValidAudience = jwtAudience,
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero
     };
@@ -122,18 +161,24 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "API de Comandes JDSR v1");
-        c.RoutePrefix = "swagger"; // Serve Swagger UI at /swagger
+        c.RoutePrefix = "swagger";
     });
 }
 else
 {
-    // Només redirigir a HTTPS en producció
+    // En producció, usar manejo de errores más seguro
+    app.UseExceptionHandler("/error");
+    app.UseHsts();
     app.UseHttpsRedirection();
 }
+
+// Habilitar CORS
+app.UseCors("DefaultCorsPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();
