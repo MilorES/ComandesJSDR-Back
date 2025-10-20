@@ -10,6 +10,7 @@ Requereix MariaDB en funcionament.
 ```shell
 # Des de ComandesAPI del repo
 dotnet run
+# La conexió amb la BD la treu de DefaultConnection del /ComandesAPI/appsettings.json
 ```
 
 # Desplegament
