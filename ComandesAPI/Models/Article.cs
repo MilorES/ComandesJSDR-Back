@@ -27,7 +27,7 @@ namespace ComandesAPI.Models
         [StringLength(20, ErrorMessage = "La categoria no pot excedir 20 caràcters")]
         public string? Categoria { get; set; }
 
-        public bool Actiu { get; set; } = true;
+        public bool Actiu { get; set; }
 
         public DateTime DataCreacio { get; set; } = DateTime.UtcNow;
 

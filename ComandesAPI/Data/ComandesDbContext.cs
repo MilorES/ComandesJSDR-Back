@@ -23,7 +23,7 @@ namespace ComandesAPI.Data
                 entity.Property(e => e.Preu).HasColumnType("decimal(10,2)").IsRequired();
                 entity.Property(e => e.Estoc).IsRequired();
                 entity.Property(e => e.Categoria).HasMaxLength(20);
-                entity.Property(e => e.Actiu).IsRequired().HasDefaultValue(true);
+                entity.Property(e => e.Actiu).IsRequired();
                 entity.Property(e => e.DataCreacio).IsRequired();
                 entity.Property(e => e.DataModificacio);
 
