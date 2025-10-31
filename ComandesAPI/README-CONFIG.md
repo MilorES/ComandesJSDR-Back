@@ -73,36 +73,32 @@ Configuració per producció
 ```
 En producció, **MAI** utilitzis fitxers de configuració per a informació sensible. Utilitza variables d'entorn.
 
-### Pas 1: Si no existeix crear el fitxer .env 
+### Pas 1: Si no existeixen crear els fitxers 
 
 ```shell
-# Des de l'arrel ./
+# Des de l'arrel /
 cp .env.example .env
+# Des de /ComandesAPI
+cp appsettings.Development.example.json appsettings.Development.json
 ```
+**IMPORTANT** No afegir aquest  FITXERS al GIT `.env` ni `appsettings.Development.json`
 
-### Pas 2: Configurar variables a .env
+### Pas 2: Configurar variables
 
-Edita el fitxer `.env` amb les credencials i JWT:
+Desenvolupament: edita el fitxer `/ComandesAPI/appsettings.Development.json` amb les credencials i JWT.
 
-```env
-MYSQL_ROOT_PASSWORD=rootpassword
-MYSQL_DATABASE=comandesjdsr
-MYSQL_USER=userapi
-MYSQL_PASSWORD=passwordapi
-MYSQL_PORT=3306
+Producció: edita el fitxer `/.env` amb les credencials i JWT.
 
-JWT_SECRET_KEY=ClauSecretaJWTComandesJSDR2025MoltSeguraAmbAlmenys32Caracters!
-JWT_ISSUER=ComandesJSDR
-JWT_AUDIENCE=ComandesJSDR-API
-```
 ### Opcional: Començar des de zero
 ```shell
+# Des de l'arrel ./
 docker compose down -v --remove-orphans
 ```
 
 ### Pas 3: Executar amb Docker Compose
 
 ```shell
+# Des de l'arrel ./
 docker compose up --build -d
 ```
 ### Logs
