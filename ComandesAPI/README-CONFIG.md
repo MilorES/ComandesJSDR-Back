@@ -8,17 +8,20 @@ L'aplicació suporta múltiples entorns mitjançant fitxers de configuració i v
 
 ### Fitxers de Configuració
 
-- `appsettings.json` - Configuració base (SENSE informació sensible)
-- `appsettings.Development.json` - Configuració per a desenvolupament local (NO es puja a Git)
-- `appsettings.Production.json` - Configuració per a producció (segura per a Git)
+- `appsettings.json` - Configuració base (SENSE informació sensible).
+- `appsettings.Development.json` - Configuració per a desenvolupament local (NO es puja a Git).
+- `appsettings.Production.json` - Configuració per a producció (segura per a Git).
 
 ## Configuració per a Desenvolupament Local
 
 ### Pas 1: Crear fitxer de configuració de desenvolupament
 
-Copia el fitxer d'exemple i configura'l amb les teves credencials locals:
+- Requereix MariaDB en funcionament.
+- Treballar al directori `/ComandesAPI`.
 
-```bash
+Ccopia el fitxer d'exemple i configura'l amb les teves credencials locals:
+ 
+```shell
 cp appsettings.Development.example.json appsettings.Development.json
 ```
 
@@ -38,7 +41,8 @@ cp appsettings.Development.example.json appsettings.Development.json
   "Cors": {
     "AllowedOrigins": [
       "http://localhost:3000",
-      "http://localhost:5173"
+      "http://localhost:5173",
+      "http://localhost:4200"
     ]
   }
 }
@@ -46,23 +50,39 @@ cp appsettings.Development.example.json appsettings.Development.json
 
 ### Pas 3: Executar l'aplicació
 
-```bash
+```shell
+# Des de /ComandesAPI
 dotnet run
 ```
 
 L'aplicació s'executarà en mode Development per defecte.
 
-## Configuració per a Docker (Desenvolupament)
+## Configuració per a Docker
 
-### Pas 1: Crear fitxer .env
+Requereix Docker y Docker Compose.
 
-```bash
+### Pas 0: Editar docker-compose.yml
+
+Configuració per desenvolupament
+```yml
+- ASPNETCORE_ENVIRONMENT=Development
+```
+Configuració per producció
+```yml
+- ASPNETCORE_ENVIRONMENT=Production
+```
+En producció, **MAI** utilitzis fitxers de configuració per a informació sensible. Utilitza variables d'entorn.
+
+### Pas 1: Si no existeix crear el fitxer .env 
+
+```shell
+# Des de l'arrel ./
 cp .env.example .env
 ```
 
 ### Pas 2: Configurar variables a .env
 
-Edita el fitxer `.env` amb les teves credencials:
+Edita el fitxer `.env` amb les credencials i JWT:
 
 ```env
 MYSQL_ROOT_PASSWORD=rootpassword
@@ -71,66 +91,30 @@ MYSQL_USER=userapi
 MYSQL_PASSWORD=passwordapi
 MYSQL_PORT=3306
 
-DB_HOST=db
-DB_NAME=comandesjdsr
-DB_USER=userapi
-DB_PASS=passwordapi
+JWT_SECRET_KEY=ClauSecretaJWTComandesJSDR2025MoltSeguraAmbAlmenys32Caracters!
+JWT_ISSUER=ComandesJSDR
+JWT_AUDIENCE=ComandesJSDR-API
+```
+### Opcional: Començar des de zero
+```shell
+docker compose down -v --remove-orphans
 ```
 
 ### Pas 3: Executar amb Docker Compose
 
-```bash
-docker-compose up -d
+```shell
+docker compose up --build -d
 ```
+### Logs
 
-## Configuració per a Producció
-
-En producció, **MAI** utilitzis fitxers de configuració per a informació sensible. Utilitza variables d'entorn.
-
-### Variables d'Entorn Requerides
-
-#### Connexió a Base de Dades
-
-**Opció 1: Variables individuals**
-```bash
-export DB_HOST=el-teu-servidor-db.com
-export DB_NAME=comandesjdsr
-export DB_USER=usuari_produccio
-export DB_PASS=password_segur_produccio
+```shell
+# Tots
+docker compose logs -f 
+# ASPNETCORE
+docker compose logs -f comandesapi
+# MARIADB
+docker compose logs -f mariadb
 ```
-
-**Opció 2: Connection String completa**
-```bash
-export ConnectionStrings__DefaultConnection="Server=el-teu-servidor-db.com;Database=comandesjdsr;User=usuari_produccio;Password=password_segur_produccio;"
-```
-
-#### Configuració JWT
-
-```bash
-export JWT_SECRET_KEY="clau_super_secreta_de_produccio_minim_32_caracters"
-export JWT_ISSUER="ComandesJSDR"
-export JWT_AUDIENCE="ComandesJSDR-API"
-```
-
-#### Executar en Producció
-
-```bash
-export ASPNETCORE_ENVIRONMENT=Production
-dotnet ComandesAPI.dll
-```
-
-### Azure App Service / AWS / Google Cloud
-
-En serveis cloud, configura les variables d'entorn al panell de configuració:
-
-**Azure App Service:**
-- Configuració → Configuració de l'aplicació → Afegir nova configuració
-
-**AWS Elastic Beanstalk:**
-- Configuració → Software → Variables d'entorn
-
-**Google Cloud Run:**
-- Editar servei → Variables i secrets
 
 ## Prioritat de Configuració
 
