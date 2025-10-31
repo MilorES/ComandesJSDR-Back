@@ -18,7 +18,7 @@ namespace ComandesAPI.Data
                     Preu = 899.99m,
                     Estoc = 10,
                     Categoria = "Informàtica",
-                    Actiu = true,
+                    Actiu = false,
                     DataCreacio = dataCreacio
                 },
                 new Article
@@ -117,7 +117,7 @@ namespace ComandesAPI.Data
                     Preu = 45.99m,
                     Estoc = 18,
                     Categoria = "Informàtica",
-                    Actiu = true,
+                    Actiu = false,
                     DataCreacio = dataCreacio
                 }
             );

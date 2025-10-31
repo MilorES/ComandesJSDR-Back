@@ -77,7 +77,7 @@ namespace ComandesAPI.Migrations
                         new
                         {
                             Id = 1,
-                            Actiu = true,
+                            Actiu = false,
                             Categoria = "Informàtica",
                             DataCreacio = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Descripcio = "Ordinador portàtil per oficina amb pantalla de 15.6 polzades",
@@ -176,7 +176,7 @@ namespace ComandesAPI.Migrations
                         new
                         {
                             Id = 10,
-                            Actiu = true,
+                            Actiu = false,
                             Categoria = "Informàtica",
                             DataCreacio = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Descripcio = "Càmera web Full HD 1080p amb micròfon integrat",
