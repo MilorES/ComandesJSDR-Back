@@ -62,7 +62,7 @@ namespace ComandesAPI.Data
                     Preu = 149.99m,
                     Estoc = 8,
                     Categoria = "Mobiliari",
-                    Actiu = true,
+                    Actiu = false,
                     DataCreacio = dataCreacio
                 },
                 new Article
@@ -106,7 +106,7 @@ namespace ComandesAPI.Data
                     Preu = 79.99m,
                     Estoc = 20,
                     Categoria = "Àudio",
-                    Actiu = true,
+                    Actiu = false,
                     DataCreacio = dataCreacio
                 },
                 new Article

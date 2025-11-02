@@ -4,6 +4,7 @@ using ComandesAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ComandesAPI.Migrations
 {
     [DbContext(typeof(ComandesDbContext))]
-    partial class ComandesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251030140259_UpdateArticlesActiu")]
+    partial class UpdateArticlesActiu
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,7 +75,7 @@ namespace ComandesAPI.Migrations
                         new
                         {
                             Id = 1,
-                            Actiu = false,
+                            Actiu = true,
                             Categoria = "Informàtica",
                             DataCreacio = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Descripcio = "Ordinador portàtil per oficina amb pantalla de 15.6 polzades",
@@ -171,92 +174,13 @@ namespace ComandesAPI.Migrations
                         new
                         {
                             Id = 10,
-                            Actiu = false,
+                            Actiu = true,
                             Categoria = "Informàtica",
                             DataCreacio = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Descripcio = "Càmera web Full HD 1080p amb micròfon integrat",
                             Estoc = 18,
                             Nom = "Webcam HD",
                             Preu = 45.99m
-                        });
-                });
-
-            modelBuilder.Entity("ComandesAPI.Models.Usuari", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<bool>("IsEnabled")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(true);
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)")
-                        .HasDefaultValue("User");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique()
-                        .HasDatabaseName("IX_Usuaris_Email");
-
-                    b.HasIndex("Username")
-                        .IsUnique()
-                        .HasDatabaseName("IX_Usuaris_Username");
-
-                    b.ToTable("Usuaris");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "admin@comandesjdsr.com",
-                            FullName = "Administrador del Sistema",
-                            IsEnabled = true,
-                            PasswordHash = "$2a$12$wKQgs3QYMJdHm791BDWZ7eJCndZsZAvQYcbBQ9UCEs.sFP6Hp1LOW",
-                            Role = "Administrator",
-                            Username = "administrador"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "usuari@comandesjdsr.com",
-                            FullName = "Usuari Estàndard",
-                            IsEnabled = true,
-                            PasswordHash = "$2a$12$wKQgs3QYMJdHm791BDWZ7eJCndZsZAvQYcbBQ9UCEs.sFP6Hp1LOW",
-                            Role = "User",
-                            Username = "usuari"
                         });
                 });
 #pragma warning restore 612, 618
