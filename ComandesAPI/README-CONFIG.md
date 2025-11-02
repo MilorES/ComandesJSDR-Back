@@ -19,7 +19,7 @@ L'aplicació suporta múltiples entorns mitjançant fitxers de configuració i v
 - Requereix MariaDB en funcionament.
 - Treballar al directori `/ComandesAPI`.
 
-Ccopia el fitxer d'exemple i configura'l amb les teves credencials locals:
+Copia el fitxer d'exemple i configura'l amb les teves credencials locals:
  
 ```shell
 cp appsettings.Development.example.json appsettings.Development.json
