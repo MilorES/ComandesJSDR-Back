@@ -78,9 +78,10 @@ namespace ComandesAPI.Services
 
                 return userId;
             }
-            catch
+            catch (Exception ex)
             {
                 // Token invàlid o expirat
+                // TODO: Log exception 'ex' as needed for debugging
                 return null;
             }
         }
