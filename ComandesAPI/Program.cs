@@ -171,7 +171,7 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    // En producció, usar manejo de errores más seguro
+    // En producció, usar maneig d'errors més segur
     app.UseExceptionHandler("/error");
     app.UseHsts();
     app.UseHttpsRedirection();
