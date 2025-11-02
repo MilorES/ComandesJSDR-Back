@@ -36,24 +36,14 @@ services:
       - DB_USER=${MYSQL_USER}
       - DB_PASS=${MYSQL_PASSWORD}
       - DB_PORT=${MYSQL_PORT}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ISSUER=${JWT_ISSUER}
+      - JWT_AUDIENCE=${JWT_AUDIENCE}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
       - "5000:80"
     restart: unless-stopped
-
-  migrate:
-    image: mcr.microsoft.com/dotnet/sdk:9.0
-    container_name: comandes_migrate
-    depends_on:
-      - mariadb
-    env_file:
-      - .env
-    working_dir: /src
-    volumes:
-      - ./:/src:delegated
-    # Instal·lar l'eina dotnet-ef i executeu migracions contra la base de dades definida a .env
-    command: "/bin/bash -lc 'dotnet tool install --global dotnet-ef --version 9.* || true && export PATH=\"$PATH:/root/.dotnet/tools\" && dotnet ef database update --project ComandesAPI/ComandesAPI.csproj --startup-project ComandesAPI/ComandesAPI.csproj'"
-
 
 volumes:
   db_data:

@@ -10,6 +10,7 @@ namespace ComandesAPI.Data
         }
 
         public DbSet<Article> Articles { get; set; }
+        public DbSet<Usuari> Usuaris { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -31,8 +32,25 @@ namespace ComandesAPI.Data
                 entity.HasIndex(e => e.Categoria).HasDatabaseName("IX_Articles_Categoria");
             });
 
-            // Aplicar datos SEED desde archivo separado
+            // Configuració de l'entitat Usuari
+            modelBuilder.Entity<Usuari>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Username).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.PasswordHash).IsRequired();
+                entity.Property(e => e.FullName).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Email).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Role).IsRequired().HasMaxLength(20).HasDefaultValue("User");
+                entity.Property(e => e.CreatedAt).IsRequired();
+                entity.Property(e => e.IsEnabled).IsRequired().HasDefaultValue(true);
+
+                entity.HasIndex(e => e.Username).IsUnique().HasDatabaseName("IX_Usuaris_Username");
+                entity.HasIndex(e => e.Email).IsUnique().HasDatabaseName("IX_Usuaris_Email");
+            });
+
+            // Aplicar dades SEED des d'arxius separats
             modelBuilder.SeedArticles();
+            modelBuilder.SeedUsers();
         }
     }
 }

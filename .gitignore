@@ -41,6 +41,7 @@ ScaffoldingReadMe.txt
 *~
 CodeCoverage/
 .vs/
+.claude/
 
 # MSBuild Binary and Structured Log
 *.binlog
@@ -54,5 +55,7 @@ CodeCoverage/
 TestResult.xml
 nunit-*.xml
 
-# Environment variables
+# Environment variables and sensitive configuration
 .env
+appsettings.Development.json
+**/appsettings.*.local.json
