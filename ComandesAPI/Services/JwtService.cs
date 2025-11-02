@@ -34,11 +34,14 @@ namespace ComandesAPI.Services
                 new Claim(ClaimTypes.Role, user.Role)
             };
 
+            // Get expiration from configuration (default to 60 minutes if not set)
+            int expirationMinutes = 60;
+            int.TryParse(_configuration["Jwt:ExpirationMinutes"], out expirationMinutes);
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(1), // Token expira en 1 hora
+                expires: DateTime.UtcNow.AddMinutes(expirationMinutes), // Token expira segons configuració
                 signingCredentials: credentials
             );
 
