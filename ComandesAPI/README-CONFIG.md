@@ -81,7 +81,7 @@ cp .env.example .env
 # Des de /ComandesAPI
 cp appsettings.Development.example.json appsettings.Development.json
 ```
-**IMPORTANT** No afegir aquest  FITXERS al GIT `.env` ni `appsettings.Development.json`
+**IMPORTANT** No afegir aquests fitxers al GIT `.env` ni `appsettings.Development.json`
 
 ### Pas 2: Configurar variables
 
