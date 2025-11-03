@@ -16,7 +16,7 @@ namespace ComandesAPI.Data
                     Nom = "Ordinador portàtil",
                     Descripcio = "Ordinador portàtil per oficina amb pantalla de 15.6 polzades",
                     Preu = 899.99m,
-                    Estoc = 10,
+                    Estoc = 0,
                     Categoria = "Informàtica",
                     Actiu = false,
                     DataCreacio = dataCreacio

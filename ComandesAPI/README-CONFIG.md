@@ -59,7 +59,7 @@ L'aplicació s'executarà en mode Development per defecte.
 
 ## Configuració per a Docker
 
-Requereix Docker y Docker Compose.
+Requereix Docker y Docker Compose. Seguint la guia crear els fitxers`.env` i `appsettings.Development.json`, per evitar problemes confirmeu que tingue el mateix valor a JWT_SECRET_KEY. 
 
 ### Pas 0: Editar docker-compose.yml
 

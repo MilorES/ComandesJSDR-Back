@@ -4,6 +4,7 @@ using ComandesAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ComandesAPI.Migrations
 {
     [DbContext(typeof(ComandesDbContext))]
-    partial class ComandesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251103090124_AfegirClientsComandesLinies")]
+    partial class AfegirClientsComandesLinies
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,7 +34,9 @@ namespace ComandesAPI.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("Actiu")
-                        .HasColumnType("tinyint(1)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("Categoria")
                         .HasMaxLength(20)
@@ -116,7 +121,7 @@ namespace ComandesAPI.Migrations
                         new
                         {
                             Id = 5,
-                            Actiu = false,
+                            Actiu = true,
                             Categoria = "Mobiliari",
                             DataCreacio = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Descripcio = "Cadira ergonòmica amb suport lumbar ajustable",
@@ -160,7 +165,7 @@ namespace ComandesAPI.Migrations
                         new
                         {
                             Id = 9,
-                            Actiu = false,
+                            Actiu = true,
                             Categoria = "Àudio",
                             DataCreacio = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Descripcio = "Auriculars inalàmbrics amb cancel·lació de soroll",
@@ -171,7 +176,7 @@ namespace ComandesAPI.Migrations
                         new
                         {
                             Id = 10,
-                            Actiu = false,
+                            Actiu = true,
                             Categoria = "Informàtica",
                             DataCreacio = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Descripcio = "Càmera web Full HD 1080p amb micròfon integrat",
@@ -251,24 +256,6 @@ namespace ComandesAPI.Migrations
                         .HasDatabaseName("IX_Clients_UsuariId");
 
                     b.ToTable("Clients");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Actiu = true,
-                            Adreca = "Carrer de la Innovació, 42",
-                            CodiPostal = "08028",
-                            DataCreacio = new DateTime(2025, 1, 15, 10, 0, 0, 0, DateTimeKind.Utc),
-                            NIF = "B12345678",
-                            NomEmpresa = "Tecnologies Avançades SL",
-                            Notes = "Client preferent amb descompte del 5% en compres superiors a 1000€",
-                            Pais = "Espanya",
-                            Poblacio = "Barcelona",
-                            Provincia = "Barcelona",
-                            Telefon = "+34 932 456 789",
-                            UsuariId = 2
-                        });
                 });
 
             modelBuilder.Entity("ComandesAPI.Models.Comanda", b =>
@@ -339,82 +326,6 @@ namespace ComandesAPI.Migrations
                         .HasDatabaseName("IX_Comandes_NumeroComanda");
 
                     b.ToTable("Comandes");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Actiu = true,
-                            ClientId = 1,
-                            DataCreacio = new DateTime(2025, 2, 1, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DescomptePercentatge = 0m,
-                            Estat = 0,
-                            ImportDescompte = 0m,
-                            NumeroComanda = "COM-2025-000001",
-                            Observacions = "Primera comanda en fase d'elaboració",
-                            Total = 370.48m,
-                            TotalAmbDescompte = 370.48m
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Actiu = true,
-                            ClientId = 1,
-                            DataCreacio = new DateTime(2025, 2, 3, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DescomptePercentatge = 5m,
-                            Estat = 1,
-                            ImportDescompte = 47.00m,
-                            NumeroComanda = "COM-2025-000002",
-                            Observacions = "Material per nova oficina - urgent",
-                            Total = 939.96m,
-                            TotalAmbDescompte = 892.96m
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Actiu = true,
-                            ClientId = 1,
-                            DataAprovacio = new DateTime(2025, 2, 7, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DataCreacio = new DateTime(2025, 2, 6, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DescomptePercentatge = 10m,
-                            Estat = 2,
-                            ImportDescompte = 90.00m,
-                            NumeroComanda = "COM-2025-000003",
-                            Observacions = "Mobiliari per sala de reunions",
-                            Total = 899.95m,
-                            TotalAmbDescompte = 809.95m
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Actiu = true,
-                            ClientId = 1,
-                            DataAprovacio = new DateTime(2025, 2, 12, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DataCreacio = new DateTime(2025, 2, 11, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DescomptePercentatge = 0m,
-                            Estat = 3,
-                            ImportDescompte = 0m,
-                            NumeroComanda = "COM-2025-000004",
-                            Observacions = "Equipament informàtic complet per 3 treballadors",
-                            Total = 625.93m,
-                            TotalAmbDescompte = 625.93m
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Actiu = true,
-                            ClientId = 1,
-                            DataAprovacio = new DateTime(2025, 2, 17, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DataCreacio = new DateTime(2025, 2, 16, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DataFinalitzacio = new DateTime(2025, 2, 21, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DescomptePercentatge = 5m,
-                            Estat = 5,
-                            ImportDescompte = 55.00m,
-                            NumeroComanda = "COM-2025-000005",
-                            Observacions = "Comanda completada i lliurada. Client satisfet.",
-                            Total = 1099.94m,
-                            TotalAmbDescompte = 1044.94m
-                        });
                 });
 
             modelBuilder.Entity("ComandesAPI.Models.LiniaComanda", b =>
@@ -473,232 +384,6 @@ namespace ComandesAPI.Migrations
                         .HasDatabaseName("IX_LiniesComanda_ComandaId");
 
                     b.ToTable("LiniesComanda");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ArticleId = 2,
-                            ComandaId = 1,
-                            DataCreacio = new DateTime(2025, 2, 1, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DescomptePercentatge = 0m,
-                            Descripcio = "Ratolí òptic sense fils amb sensor de precisió",
-                            ImportDescompte = 0m,
-                            NomProducte = "Ratolí sense fils",
-                            Ordre = 0,
-                            PreuUnitari = 25.50m,
-                            Quantitat = 5m,
-                            Subtotal = 127.50m,
-                            Total = 127.50m
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ArticleId = 10,
-                            ComandaId = 1,
-                            DataCreacio = new DateTime(2025, 2, 1, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DescomptePercentatge = 0m,
-                            Descripcio = "Càmera web Full HD 1080p amb micròfon integrat",
-                            ImportDescompte = 0m,
-                            NomProducte = "Webcam HD",
-                            Ordre = 1,
-                            PreuUnitari = 45.99m,
-                            Quantitat = 3m,
-                            Subtotal = 137.97m,
-                            Total = 137.97m
-                        },
-                        new
-                        {
-                            Id = 3,
-                            ArticleId = 6,
-                            ComandaId = 1,
-                            DataCreacio = new DateTime(2025, 2, 1, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DescomptePercentatge = 10m,
-                            Descripcio = "Impressora làser monocrom amb connexió Wi-Fi",
-                            ImportDescompte = 9.00m,
-                            NomProducte = "Impressora làser",
-                            Ordre = 2,
-                            PreuUnitari = 89.99m,
-                            Quantitat = 1m,
-                            Subtotal = 89.99m,
-                            Total = 80.99m
-                        },
-                        new
-                        {
-                            Id = 4,
-                            ArticleId = 3,
-                            ComandaId = 1,
-                            DataCreacio = new DateTime(2025, 2, 1, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DescomptePercentatge = 5m,
-                            Descripcio = "Teclat mecànic retroil·luminat amb switches Cherry MX",
-                            ImportDescompte = 12.00m,
-                            NomProducte = "Teclat mecànic",
-                            Ordre = 3,
-                            PreuUnitari = 120.00m,
-                            Quantitat = 2m,
-                            Subtotal = 240.00m,
-                            Total = 228.00m
-                        },
-                        new
-                        {
-                            Id = 5,
-                            ArticleId = 4,
-                            ComandaId = 2,
-                            DataCreacio = new DateTime(2025, 2, 3, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DescomptePercentatge = 0m,
-                            Descripcio = "Monitor LED Full HD 1920x1080 amb connexió HDMI",
-                            ImportDescompte = 0m,
-                            NomProducte = "Monitor 24 polzades",
-                            Ordre = 0,
-                            PreuUnitari = 189.99m,
-                            Quantitat = 4m,
-                            Subtotal = 759.96m,
-                            Total = 759.96m
-                        },
-                        new
-                        {
-                            Id = 6,
-                            ArticleId = 7,
-                            ComandaId = 2,
-                            DataCreacio = new DateTime(2025, 2, 3, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DescomptePercentatge = 0m,
-                            Descripcio = "Disc dur extern USB 3.0 de 1TB per còpies de seguretat",
-                            ImportDescompte = 0m,
-                            NomProducte = "Disc dur extern 1TB",
-                            Ordre = 1,
-                            PreuUnitari = 59.99m,
-                            Quantitat = 3m,
-                            Subtotal = 179.97m,
-                            Total = 179.97m
-                        },
-                        new
-                        {
-                            Id = 7,
-                            ArticleId = 5,
-                            ComandaId = 3,
-                            DataCreacio = new DateTime(2025, 2, 6, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DescomptePercentatge = 0m,
-                            Descripcio = "Cadira ergonòmica amb suport lumbar ajustable",
-                            ImportDescompte = 0m,
-                            NomProducte = "Cadira d'oficina",
-                            Ordre = 0,
-                            PreuUnitari = 149.99m,
-                            Quantitat = 4m,
-                            Subtotal = 599.96m,
-                            Total = 599.96m
-                        },
-                        new
-                        {
-                            Id = 8,
-                            ArticleId = 8,
-                            ComandaId = 3,
-                            DataCreacio = new DateTime(2025, 2, 6, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DescomptePercentatge = 0m,
-                            Descripcio = "Taula d'oficina de fusta amb calaixos i organitzador",
-                            ImportDescompte = 0m,
-                            NomProducte = "Taula d'oficina",
-                            Ordre = 1,
-                            PreuUnitari = 299.99m,
-                            Quantitat = 1m,
-                            Subtotal = 299.99m,
-                            Total = 299.99m
-                        },
-                        new
-                        {
-                            Id = 9,
-                            ArticleId = 2,
-                            ComandaId = 4,
-                            DataCreacio = new DateTime(2025, 2, 11, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DescomptePercentatge = 0m,
-                            Descripcio = "Ratolí òptic sense fils amb sensor de precisió",
-                            ImportDescompte = 0m,
-                            NomProducte = "Ratolí sense fils",
-                            Ordre = 0,
-                            PreuUnitari = 25.50m,
-                            Quantitat = 3m,
-                            Subtotal = 76.50m,
-                            Total = 76.50m
-                        },
-                        new
-                        {
-                            Id = 10,
-                            ArticleId = 3,
-                            ComandaId = 4,
-                            DataCreacio = new DateTime(2025, 2, 11, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DescomptePercentatge = 0m,
-                            Descripcio = "Teclat mecànic retroil·luminat amb switches Cherry MX",
-                            ImportDescompte = 0m,
-                            NomProducte = "Teclat mecànic",
-                            Ordre = 1,
-                            PreuUnitari = 120.00m,
-                            Quantitat = 3m,
-                            Subtotal = 360.00m,
-                            Total = 360.00m
-                        },
-                        new
-                        {
-                            Id = 11,
-                            ArticleId = 9,
-                            ComandaId = 4,
-                            DataCreacio = new DateTime(2025, 2, 11, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DescomptePercentatge = 5m,
-                            Descripcio = "Auriculars inalàmbrics amb cancel·lació de soroll",
-                            ImportDescompte = 12.00m,
-                            NomProducte = "Auriculars Bluetooth",
-                            Ordre = 2,
-                            PreuUnitari = 79.99m,
-                            Quantitat = 3m,
-                            Subtotal = 239.97m,
-                            Total = 227.97m
-                        },
-                        new
-                        {
-                            Id = 12,
-                            ArticleId = 4,
-                            ComandaId = 5,
-                            DataCreacio = new DateTime(2025, 2, 16, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DescomptePercentatge = 0m,
-                            Descripcio = "Monitor LED Full HD 1920x1080 amb connexió HDMI",
-                            ImportDescompte = 0m,
-                            NomProducte = "Monitor 24 polzades",
-                            Ordre = 0,
-                            PreuUnitari = 189.99m,
-                            Quantitat = 2m,
-                            Subtotal = 379.98m,
-                            Total = 379.98m
-                        },
-                        new
-                        {
-                            Id = 13,
-                            ArticleId = 8,
-                            ComandaId = 5,
-                            DataCreacio = new DateTime(2025, 2, 16, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DescomptePercentatge = 0m,
-                            Descripcio = "Taula d'oficina de fusta amb calaixos i organitzador",
-                            ImportDescompte = 0m,
-                            NomProducte = "Taula d'oficina",
-                            Ordre = 1,
-                            PreuUnitari = 299.99m,
-                            Quantitat = 2m,
-                            Subtotal = 599.98m,
-                            Total = 599.98m
-                        },
-                        new
-                        {
-                            Id = 14,
-                            ArticleId = 7,
-                            ComandaId = 5,
-                            DataCreacio = new DateTime(2025, 2, 16, 10, 0, 0, 0, DateTimeKind.Utc),
-                            DescomptePercentatge = 0m,
-                            Descripcio = "Disc dur extern USB 3.0 de 1TB per còpies de seguretat",
-                            ImportDescompte = 0m,
-                            NomProducte = "Disc dur extern 1TB",
-                            Ordre = 2,
-                            PreuUnitari = 59.99m,
-                            Quantitat = 2m,
-                            Subtotal = 119.98m,
-                            Total = 119.98m
-                        });
                 });
 
             modelBuilder.Entity("ComandesAPI.Models.Usuari", b =>

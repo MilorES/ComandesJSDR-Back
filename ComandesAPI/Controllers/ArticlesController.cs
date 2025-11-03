@@ -124,7 +124,8 @@ namespace ComandesAPI.Controllers
         /// <param name="createArticleDto">Dades del nou article</param>
         /// <returns>Article creat</returns>
         [HttpPost]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator")] // Només accessibles per administradors
+
         public async Task<ActionResult<ArticleDto>> CreateArticle(CreateArticleDto createArticleDto)
         {
             try
@@ -186,7 +187,8 @@ namespace ComandesAPI.Controllers
         /// <param name="updateArticleDto">Noves dades de l'article</param>
         /// <returns>Article actualitzat</returns>
         [HttpPut("{id}")]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator")] // Només accessibles per administradors
+
         public async Task<ActionResult<ArticleDto>> UpdateArticle(int id, UpdateArticleDto updateArticleDto)
         {
             try
@@ -266,7 +268,8 @@ namespace ComandesAPI.Controllers
         /// <param name="id">ID de l'article a eliminar</param>
         /// <returns>Missatge de confirmació</returns>
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator")] // Només accessibles per administradors
+
         public async Task<IActionResult> DeleteArticle(int id)
         {
             try
