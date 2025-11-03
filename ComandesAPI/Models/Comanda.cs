@@ -19,16 +19,16 @@ public class Comanda
     public string NumeroComanda { get; set; } = string.Empty;
 
     /// <summary>
-    /// FK al client que fa la comanda
+    /// FK a l'usuari que fa la comanda
     /// </summary>
     [Required]
-    public int ClientId { get; set; }
+    public int UsuariId { get; set; }
 
     /// <summary>
-    /// Propietat de navegació al Client
+    /// Propietat de navegació a l'Usuari
     /// </summary>
-    [ForeignKey(nameof(ClientId))]
-    public Client Client { get; set; } = null!;
+    [ForeignKey(nameof(UsuariId))]
+    public Usuari Usuari { get; set; } = null!;
 
     /// <summary>
     /// Estat actual de la comanda

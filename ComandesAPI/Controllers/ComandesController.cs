@@ -39,8 +39,7 @@ namespace ComandesAPI.Controllers
                 var isAdmin = User.IsInRole("Administrator");
 
                 var query = _context.Comandes
-                    .Include(c => c.Client)
-                        .ThenInclude(cl => cl.Usuari)
+                    .Include(c => c.Usuari)
                     .Include(c => c.Linies)
                         .ThenInclude(l => l.Article)
                     .AsQueryable();
@@ -48,7 +47,7 @@ namespace ComandesAPI.Controllers
                 // Si no és administrador, només pot veure les seves comandes
                 if (!isAdmin)
                 {
-                    query = query.Where(c => c.Client.UsuariId == userId);
+                    query = query.Where(c => c.UsuariId == userId);
                 }
 
                 if (estat.HasValue)
@@ -89,8 +88,7 @@ namespace ComandesAPI.Controllers
                 var isAdmin = User.IsInRole("Administrator");
 
                 var comanda = await _context.Comandes
-                    .Include(c => c.Client)
-                        .ThenInclude(cl => cl.Usuari)
+                    .Include(c => c.Usuari)
                     .Include(c => c.Linies)
                         .ThenInclude(l => l.Article)
                     .FirstOrDefaultAsync(c => c.Id == id);
@@ -101,7 +99,7 @@ namespace ComandesAPI.Controllers
                 }
 
                 // Verificar que l'usuari pugui accedir a aquesta comanda
-                if (!isAdmin && comanda.Client.UsuariId != userId)
+                if (!isAdmin && comanda.UsuariId != userId)
                 {
                     return Forbid();
                 }
@@ -132,15 +130,6 @@ namespace ComandesAPI.Controllers
 
                 var userId = GetCurrentUserId();
 
-                // Verificar que l'usuari tingui un client associat
-                var client = await _context.Clients
-                    .FirstOrDefaultAsync(c => c.UsuariId == userId);
-
-                if (client == null)
-                {
-                    return BadRequest("L'usuari no té un client associat. Cal crear primer el perfil de client.");
-                }
-
                 // Generar número de comanda únic
                 var numeroComanda = await GenerarNumeroComanda();
 
@@ -148,7 +137,7 @@ namespace ComandesAPI.Controllers
                 var comanda = new Comanda
                 {
                     NumeroComanda = numeroComanda,
-                    ClientId = client.Id,
+                    UsuariId = userId,
                     Estat = EstatComanda.Esborrany,
                     Observacions = createDto.Observacions,
                     DescomptePercentatge = createDto.DescomptePercentatge,
@@ -188,8 +177,7 @@ namespace ComandesAPI.Controllers
 
                 // Recarregar amb includes
                 comanda = await _context.Comandes
-                    .Include(c => c.Client)
-                        .ThenInclude(cl => cl.Usuari)
+                    .Include(c => c.Usuari)
                     .Include(c => c.Linies)
                         .ThenInclude(l => l.Article)
                     .FirstOrDefaultAsync(c => c.Id == comanda.Id);
@@ -223,7 +211,7 @@ namespace ComandesAPI.Controllers
                 var isAdmin = User.IsInRole("Administrator");
 
                 var comanda = await _context.Comandes
-                    .Include(c => c.Client)
+                    .Include(c => c.Usuari)
                     .Include(c => c.Linies)
                     .FirstOrDefaultAsync(c => c.Id == id);
 
@@ -233,7 +221,7 @@ namespace ComandesAPI.Controllers
                 }
 
                 // Verificar permisos
-                if (!isAdmin && comanda.Client.UsuariId != userId)
+                if (!isAdmin && comanda.UsuariId != userId)
                 {
                     return Forbid();
                 }
@@ -284,8 +272,7 @@ namespace ComandesAPI.Controllers
 
                 // Recarregar amb includes
                 comanda = await _context.Comandes
-                    .Include(c => c.Client)
-                        .ThenInclude(cl => cl.Usuari)
+                    .Include(c => c.Usuari)
                     .Include(c => c.Linies)
                         .ThenInclude(l => l.Article)
                     .FirstOrDefaultAsync(c => c.Id == id);
@@ -319,7 +306,7 @@ namespace ComandesAPI.Controllers
                 var isAdmin = User.IsInRole("Administrator");
 
                 var comanda = await _context.Comandes
-                    .Include(c => c.Client)
+                    .Include(c => c.Usuari)
                     .FirstOrDefaultAsync(c => c.Id == id);
 
                 if (comanda == null)
@@ -328,7 +315,7 @@ namespace ComandesAPI.Controllers
                 }
 
                 // Verificar permisos
-                if (!isAdmin && comanda.Client.UsuariId != userId)
+                if (!isAdmin && comanda.UsuariId != userId)
                 {
                     return Forbid();
                 }
@@ -352,8 +339,7 @@ namespace ComandesAPI.Controllers
 
                 // Recarregar amb includes
                 comanda = await _context.Comandes
-                    .Include(c => c.Client)
-                        .ThenInclude(cl => cl.Usuari)
+                    .Include(c => c.Usuari)
                     .Include(c => c.Linies)
                         .ThenInclude(l => l.Article)
                     .FirstOrDefaultAsync(c => c.Id == id);
@@ -442,24 +428,7 @@ namespace ComandesAPI.Controllers
             {
                 Id = comanda.Id,
                 NumeroComanda = comanda.NumeroComanda,
-                ClientId = comanda.ClientId,
-                Client = comanda.Client != null ? new ClientDto
-                {
-                    Id = comanda.Client.Id,
-                    UsuariId = comanda.Client.UsuariId,
-                    NomEmpresa = comanda.Client.NomEmpresa,
-                    NIF = comanda.Client.NIF,
-                    Adreca = comanda.Client.Adreca,
-                    Poblacio = comanda.Client.Poblacio,
-                    Provincia = comanda.Client.Provincia,
-                    CodiPostal = comanda.Client.CodiPostal,
-                    Pais = comanda.Client.Pais,
-                    Telefon = comanda.Client.Telefon,
-                    Notes = comanda.Client.Notes,
-                    Actiu = comanda.Client.Actiu,
-                    DataCreacio = comanda.Client.DataCreacio,
-                    DataModificacio = comanda.Client.DataModificacio
-                } : null,
+                UsuariId = comanda.UsuariId,
                 Estat = comanda.Estat,
                 DataCreacio = comanda.DataCreacio,
                 DataModificacio = comanda.DataModificacio,

@@ -11,7 +11,6 @@ namespace ComandesAPI.Data
 
         public DbSet<Article> Articles { get; set; }
         public DbSet<Usuari> Usuaris { get; set; }
-        public DbSet<Client> Clients { get; set; }
         public DbSet<Comanda> Comandes { get; set; }
         public DbSet<LiniaComanda> LiniesComanda { get; set; }
 
@@ -51,33 +50,6 @@ namespace ComandesAPI.Data
                 entity.HasIndex(e => e.Email).IsUnique().HasDatabaseName("IX_Usuaris_Email");
             });
 
-            // Configuració de l'entitat Client
-            modelBuilder.Entity<Client>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.NomEmpresa).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.NIF).IsRequired().HasMaxLength(20);
-                entity.Property(e => e.Adreca).HasMaxLength(200);
-                entity.Property(e => e.Poblacio).HasMaxLength(100);
-                entity.Property(e => e.Provincia).HasMaxLength(50);
-                entity.Property(e => e.CodiPostal).HasMaxLength(10);
-                entity.Property(e => e.Pais).HasMaxLength(50);
-                entity.Property(e => e.Telefon).HasMaxLength(20);
-                entity.Property(e => e.Notes).HasMaxLength(500);
-                entity.Property(e => e.Actiu).IsRequired().HasDefaultValue(true);
-                entity.Property(e => e.DataCreacio).IsRequired();
-                entity.Property(e => e.DataModificacio);
-
-                // Relació 1-1 amb Usuari
-                entity.HasOne(e => e.Usuari)
-                    .WithOne()
-                    .HasForeignKey<Client>(e => e.UsuariId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasIndex(e => e.UsuariId).IsUnique().HasDatabaseName("IX_Clients_UsuariId");
-                entity.HasIndex(e => e.NIF).HasDatabaseName("IX_Clients_NIF");
-            });
-
             // Configuració de l'entitat Comanda
             modelBuilder.Entity<Comanda>(entity =>
             {
@@ -95,14 +67,14 @@ namespace ComandesAPI.Data
                 entity.Property(e => e.TotalAmbDescompte).HasColumnType("decimal(10,2)").IsRequired();
                 entity.Property(e => e.Actiu).IsRequired().HasDefaultValue(true);
 
-                // Relació amb Client
-                entity.HasOne(e => e.Client)
-                    .WithMany(c => c.Comandes)
-                    .HasForeignKey(e => e.ClientId)
+                // Relació amb Usuari
+                entity.HasOne(e => e.Usuari)
+                    .WithMany()
+                    .HasForeignKey(e => e.UsuariId)
                     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasIndex(e => e.NumeroComanda).IsUnique().HasDatabaseName("IX_Comandes_NumeroComanda");
-                entity.HasIndex(e => e.ClientId).HasDatabaseName("IX_Comandes_ClientId");
+                entity.HasIndex(e => e.UsuariId).HasDatabaseName("IX_Comandes_UsuariId");
                 entity.HasIndex(e => e.Estat).HasDatabaseName("IX_Comandes_Estat");
                 entity.HasIndex(e => e.DataCreacio).HasDatabaseName("IX_Comandes_DataCreacio");
             });
@@ -141,7 +113,6 @@ namespace ComandesAPI.Data
             // Aplicar dades SEED des d'arxius separats
             modelBuilder.SeedArticles();
             modelBuilder.SeedUsers();
-            modelBuilder.SeedClients();
             modelBuilder.SeedComandes();
         }
     }

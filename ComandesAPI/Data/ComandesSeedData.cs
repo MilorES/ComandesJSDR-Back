@@ -17,7 +17,7 @@ namespace ComandesAPI.Data
             {
                 Id = 1,
                 NumeroComanda = "COM-2025-000001",
-                ClientId = 1,
+                UsuariId = 2, // Usuari estàndard
                 Estat = EstatComanda.Esborrany,
                 DataCreacio = dataBase,
                 Observacions = "Primera comanda en fase d'elaboració",
@@ -102,7 +102,7 @@ namespace ComandesAPI.Data
             {
                 Id = 2,
                 NumeroComanda = "COM-2025-000002",
-                ClientId = 1,
+                UsuariId = 2, // Usuari estàndard
                 Estat = EstatComanda.PendentAprovacio,
                 DataCreacio = dataBase.AddDays(2),
                 Observacions = "Material per nova oficina - urgent",
@@ -154,7 +154,7 @@ namespace ComandesAPI.Data
             {
                 Id = 3,
                 NumeroComanda = "COM-2025-000003",
-                ClientId = 1,
+                UsuariId = 2, // Usuari estàndard
                 Estat = EstatComanda.Aprovada,
                 DataCreacio = dataBase.AddDays(5),
                 DataAprovacio = dataBase.AddDays(6),
@@ -207,7 +207,7 @@ namespace ComandesAPI.Data
             {
                 Id = 4,
                 NumeroComanda = "COM-2025-000004",
-                ClientId = 1,
+                UsuariId = 2, // Usuari estàndard
                 Estat = EstatComanda.EnProces,
                 DataCreacio = dataBase.AddDays(10),
                 DataAprovacio = dataBase.AddDays(11),
@@ -276,7 +276,7 @@ namespace ComandesAPI.Data
             {
                 Id = 5,
                 NumeroComanda = "COM-2025-000005",
-                ClientId = 1,
+                UsuariId = 2, // Usuari estàndard
                 Estat = EstatComanda.Finalitzada,
                 DataCreacio = dataBase.AddDays(15),
                 DataAprovacio = dataBase.AddDays(16),
