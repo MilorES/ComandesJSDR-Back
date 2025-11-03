@@ -141,6 +141,8 @@ namespace ComandesAPI.Data
             // Aplicar dades SEED des d'arxius separats
             modelBuilder.SeedArticles();
             modelBuilder.SeedUsers();
+            modelBuilder.SeedClients();
+            modelBuilder.SeedComandes();
         }
     }
 }
