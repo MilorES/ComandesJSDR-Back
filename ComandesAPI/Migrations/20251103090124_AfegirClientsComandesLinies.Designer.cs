@@ -4,6 +4,7 @@ using ComandesAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ComandesAPI.Migrations
 {
     [DbContext(typeof(ComandesDbContext))]
-    partial class ComandesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251103090124_AfegirClientsComandesLinies")]
+    partial class AfegirClientsComandesLinies
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,7 +34,9 @@ namespace ComandesAPI.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("Actiu")
-                        .HasColumnType("tinyint(1)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("Categoria")
                         .HasMaxLength(20)
@@ -116,7 +121,7 @@ namespace ComandesAPI.Migrations
                         new
                         {
                             Id = 5,
-                            Actiu = false,
+                            Actiu = true,
                             Categoria = "Mobiliari",
                             DataCreacio = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Descripcio = "Cadira ergonòmica amb suport lumbar ajustable",
@@ -160,7 +165,7 @@ namespace ComandesAPI.Migrations
                         new
                         {
                             Id = 9,
-                            Actiu = false,
+                            Actiu = true,
                             Categoria = "Àudio",
                             DataCreacio = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Descripcio = "Auriculars inalàmbrics amb cancel·lació de soroll",
@@ -171,7 +176,7 @@ namespace ComandesAPI.Migrations
                         new
                         {
                             Id = 10,
-                            Actiu = false,
+                            Actiu = true,
                             Categoria = "Informàtica",
                             DataCreacio = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Descripcio = "Càmera web Full HD 1080p amb micròfon integrat",
