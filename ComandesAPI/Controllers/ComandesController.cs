@@ -130,6 +130,31 @@ namespace ComandesAPI.Controllers
 
                 var userId = GetCurrentUserId();
 
+                // Validar stock disponible per a tots els articles
+                var articlesStockInsuficient = new List<string>();
+                foreach (var liniaDto in createDto.Linies)
+                {
+                    var article = await _context.Articles.FindAsync(liniaDto.ArticleId);
+                    if (article == null)
+                    {
+                        return BadRequest($"L'article amb ID {liniaDto.ArticleId} no existeix");
+                    }
+
+                    if (article.Estoc < (int)liniaDto.Quantitat)
+                    {
+                        articlesStockInsuficient.Add($"{article.Nom} (Stock disponible: {article.Estoc}, Sol·licitat: {liniaDto.Quantitat})");
+                    }
+                }
+
+                if (articlesStockInsuficient.Any())
+                {
+                    return BadRequest(new
+                    {
+                        error = "Stock insuficient per als següents articles",
+                        articles = articlesStockInsuficient
+                    });
+                }
+
                 // Generar número de comanda únic
                 var numeroComanda = await GenerarNumeroComanda();
 
@@ -145,7 +170,7 @@ namespace ComandesAPI.Controllers
                     Actiu = true
                 };
 
-                // Afegir línies
+                // Afegir línies i descomptar stock
                 int ordre = 0;
                 foreach (var liniaDto in createDto.Linies)
                 {
@@ -167,6 +192,14 @@ namespace ComandesAPI.Controllers
                     linia.Total = linia.Subtotal - linia.ImportDescompte;
 
                     comanda.Linies.Add(linia);
+
+                    // Descomptar stock
+                    var article = await _context.Articles.FindAsync(liniaDto.ArticleId);
+                    if (article != null)
+                    {
+                        article.Estoc -= (int)liniaDto.Quantitat;
+                        article.DataModificacio = DateTime.UtcNow;
+                    }
                 }
 
                 // Calcular totals de la comanda
@@ -232,6 +265,52 @@ namespace ComandesAPI.Controllers
                     return BadRequest("Només es poden modificar comandes en estat Esborrany");
                 }
 
+                // Tornar l'stock de les línies antigues
+                foreach (var liniaAntigua in comanda.Linies)
+                {
+                    var article = await _context.Articles.FindAsync(liniaAntigua.ArticleId);
+                    if (article != null)
+                    {
+                        article.Estoc += (int)liniaAntigua.Quantitat;
+                        article.DataModificacio = DateTime.UtcNow;
+                    }
+                }
+
+                // Validar stock disponible per a les noves línies
+                var articlesStockInsuficient = new List<string>();
+                foreach (var liniaDto in updateDto.Linies)
+                {
+                    var article = await _context.Articles.FindAsync(liniaDto.ArticleId);
+                    if (article == null)
+                    {
+                        return BadRequest($"L'article amb ID {liniaDto.ArticleId} no existeix");
+                    }
+
+                    if (article.Estoc < (int)liniaDto.Quantitat)
+                    {
+                        articlesStockInsuficient.Add($"{article.Nom} (Stock disponible: {article.Estoc}, Sol·licitat: {liniaDto.Quantitat})");
+                    }
+                }
+
+                if (articlesStockInsuficient.Any())
+                {
+                    // Tornar a descomptar l'stock de les línies antigues (revertir canvis)
+                    foreach (var liniaAntigua in comanda.Linies)
+                    {
+                        var article = await _context.Articles.FindAsync(liniaAntigua.ArticleId);
+                        if (article != null)
+                        {
+                            article.Estoc -= (int)liniaAntigua.Quantitat;
+                        }
+                    }
+
+                    return BadRequest(new
+                    {
+                        error = "Stock insuficient per als següents articles",
+                        articles = articlesStockInsuficient
+                    });
+                }
+
                 // Actualitzar propietats
                 comanda.Observacions = updateDto.Observacions;
                 comanda.DescomptePercentatge = updateDto.DescomptePercentatge;
@@ -240,7 +319,7 @@ namespace ComandesAPI.Controllers
                 // Eliminar línies antigues
                 _context.LiniesComanda.RemoveRange(comanda.Linies);
 
-                // Afegir noves línies
+                // Afegir noves línies i descomptar stock
                 comanda.Linies.Clear();
                 int ordre = 0;
                 foreach (var liniaDto in updateDto.Linies)
@@ -263,6 +342,14 @@ namespace ComandesAPI.Controllers
                     linia.Total = linia.Subtotal - linia.ImportDescompte;
 
                     comanda.Linies.Add(linia);
+
+                    // Descomptar stock de les noves línies
+                    var article = await _context.Articles.FindAsync(liniaDto.ArticleId);
+                    if (article != null)
+                    {
+                        article.Estoc -= (int)liniaDto.Quantitat;
+                        article.DataModificacio = DateTime.UtcNow;
+                    }
                 }
 
                 // Recalcular totals
@@ -307,6 +394,7 @@ namespace ComandesAPI.Controllers
 
                 var comanda = await _context.Comandes
                     .Include(c => c.Usuari)
+                    .Include(c => c.Linies)
                     .FirstOrDefaultAsync(c => c.Id == id);
 
                 if (comanda == null)
@@ -318,6 +406,20 @@ namespace ComandesAPI.Controllers
                 if (!isAdmin && comanda.UsuariId != userId)
                 {
                     return Forbid();
+                }
+
+                // Si es cancel·la la comanda, retornar l'stock
+                if (canviarEstatDto.Estat == EstatComanda.Cancellada && comanda.Estat != EstatComanda.Cancellada)
+                {
+                    foreach (var linia in comanda.Linies)
+                    {
+                        var article = await _context.Articles.FindAsync(linia.ArticleId);
+                        if (article != null)
+                        {
+                            article.Estoc += (int)linia.Quantitat;
+                            article.DataModificacio = DateTime.UtcNow;
+                        }
+                    }
                 }
 
                 // Actualitzar estat
@@ -364,11 +466,24 @@ namespace ComandesAPI.Controllers
         {
             try
             {
-                var comanda = await _context.Comandes.FindAsync(id);
+                var comanda = await _context.Comandes
+                    .Include(c => c.Linies)
+                    .FirstOrDefaultAsync(c => c.Id == id);
 
                 if (comanda == null)
                 {
                     return NotFound("Comanda no trobada");
+                }
+
+                // Retornar stock dels articles de la comanda
+                foreach (var linia in comanda.Linies)
+                {
+                    var article = await _context.Articles.FindAsync(linia.ArticleId);
+                    if (article != null)
+                    {
+                        article.Estoc += (int)linia.Quantitat;
+                        article.DataModificacio = DateTime.UtcNow;
+                    }
                 }
 
                 // Desactivar en lloc d'eliminar
