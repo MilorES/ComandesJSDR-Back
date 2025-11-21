@@ -121,10 +121,15 @@ builder.Services.AddDbContext<ComandesDbContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+    var assemblyVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+    var version = assemblyVersion != null 
+        ? $"{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}" 
+        : "1.0.0";
+
     c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
     {
         Title = "API de Comandes JDSR",
-        Version = "v1",
+        Version = version,
         Description = "API per gestionar articles i comandes",
         Contact = new Microsoft.OpenApi.Models.OpenApiContact
         {
