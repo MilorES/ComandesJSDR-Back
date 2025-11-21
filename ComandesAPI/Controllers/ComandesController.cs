@@ -4,7 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using ComandesAPI.Data;
 using ComandesAPI.Models;
 using ComandesAPI.DTOs;
+using ComandesAPI.Services;
 using System.Security.Claims;
+using System.Text;
 
 namespace ComandesAPI.Controllers
 {
@@ -15,11 +17,13 @@ namespace ComandesAPI.Controllers
     {
         private readonly ComandesDbContext _context;
         private readonly ILogger<ComandesController> _logger;
+        private readonly XmlUblService _xmlUblService;
 
-        public ComandesController(ComandesDbContext context, ILogger<ComandesController> logger)
+        public ComandesController(ComandesDbContext context, ILogger<ComandesController> logger, XmlUblService xmlUblService)
         {
             _context = context;
             _logger = logger;
+            _xmlUblService = xmlUblService;
         }
 
         /// <summary>
@@ -497,6 +501,55 @@ namespace ComandesAPI.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al eliminar la comanda {Id}", id);
+                return StatusCode(500, "Error intern del servidor");
+            }
+        }
+
+        /// <summary>
+        /// Exporta una comanda en format XML-UBL
+        /// </summary>
+        /// <param name="id">ID de la comanda</param>
+        /// <returns>Fitxer XML-UBL</returns>
+        [HttpGet("{id}/export/xml-ubl")]
+        public async Task<IActionResult> ExportComandaXmlUbl(int id)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                var isAdmin = User.IsInRole("Administrator");
+
+                var comanda = await _context.Comandes
+                    .Include(c => c.Usuari)
+                    .Include(c => c.Linies)
+                        .ThenInclude(l => l.Article)
+                    .FirstOrDefaultAsync(c => c.Id == id);
+
+                if (comanda == null)
+                {
+                    return NotFound("Comanda no trobada");
+                }
+
+                // Verificar que l'usuari pugui accedir a aquesta comanda
+                if (!isAdmin && comanda.UsuariId != userId)
+                {
+                    return Forbid();
+                }
+
+                var usuari = await _context.Usuaris.FindAsync(comanda.UsuariId);
+                if (usuari == null)
+                {
+                    return NotFound("Usuari no trobat");
+                }
+
+                var xmlContent = _xmlUblService.GenerateOrderXml(comanda, usuari);
+                var bytes = Encoding.UTF8.GetBytes(xmlContent);
+                var fileName = $"{comanda.NumeroComanda}.xml";
+
+                return File(bytes, "application/xml", fileName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al exportar la comanda {Id} a XML-UBL", id);
                 return StatusCode(500, "Error intern del servidor");
             }
         }

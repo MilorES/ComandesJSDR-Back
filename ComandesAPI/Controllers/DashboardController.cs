@@ -265,6 +265,80 @@ namespace ComandesAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Obté l'acumulat de comandes i import total agrupat per mesos
+        /// Usuaris normals: només les seves comandes
+        /// Administradors: totes les comandes
+        /// </summary>
+        /// <param name="mesos">Nombre de mesos a retornar (per defecte 12)</param>
+        /// <returns>Llista amb resum mensual de comandes</returns>
+        [HttpGet("comandes/mensual")]
+        public async Task<ActionResult<IEnumerable<ResumMensualComandesDto>>> GetResumMensualComandes([FromQuery] int mesos = 12)
+        {
+            try
+            {
+                if (mesos <= 0 || mesos > 60)
+                {
+                    return BadRequest("El nombre de mesos ha d'estar entre 1 i 60");
+                }
+
+                var userId = GetCurrentUserId();
+                var isAdmin = User.IsInRole("Administrator");
+
+                // Calcular la data d'inici (primer dia del mes actual menys X mesos)
+                var avui = DateTime.UtcNow;
+                var dataInici = new DateTime(avui.Year, avui.Month, 1).AddMonths(-(mesos - 1));
+
+                var query = _context.Comandes
+                    .Where(c => c.DataCreacio >= dataInici && c.Actiu)
+                    .AsQueryable();
+
+                // Si no és administrador, només pot veure les seves comandes
+                if (!isAdmin)
+                {
+                    query = query.Where(c => c.UsuariId == userId);
+                }
+
+                var dadesAgrupades = await query
+                    .GroupBy(c => new { c.DataCreacio.Year, c.DataCreacio.Month })
+                    .Select(g => new
+                    {
+                        Any = g.Key.Year,
+                        Mes = g.Key.Month,
+                        QuantitatComandes = g.Count(),
+                        TotalImport = g.Sum(c => c.TotalAmbDescompte)
+                    })
+                    .ToListAsync();
+
+                // Generar tots els mesos del rang (incloent els que no tenen dades)
+                var resultat = new List<ResumMensualComandesDto>();
+                var dataActual = dataInici;
+
+                while (dataActual <= new DateTime(avui.Year, avui.Month, 1))
+                {
+                    var dadesMes = dadesAgrupades.FirstOrDefault(d => d.Any == dataActual.Year && d.Mes == dataActual.Month);
+
+                    resultat.Add(new ResumMensualComandesDto
+                    {
+                        Any = dataActual.Year,
+                        Mes = dataActual.Month,
+                        NomMes = dataActual.ToString("MMMM", new System.Globalization.CultureInfo("ca-ES")),
+                        QuantitatComandes = dadesMes?.QuantitatComandes ?? 0,
+                        TotalImport = dadesMes?.TotalImport ?? 0
+                    });
+
+                    dataActual = dataActual.AddMonths(1);
+                }
+
+                return Ok(resultat.OrderBy(r => r.Any).ThenBy(r => r.Mes));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtenir el resum mensual de comandes");
+                return StatusCode(500, "Error intern del servidor");
+            }
+        }
+
         // Mètodes auxiliars privats
         private int GetCurrentUserId()
         {

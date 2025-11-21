@@ -14,6 +14,9 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+// Registrar serveis d'exportació
+builder.Services.AddScoped<XmlUblService>();
+
 // Configurar CORS segons entorn
 // Prioritat: Variable d'entorn CORS_ALLOWED_ORIGINS (separats per comes) > appsettings
 var corsEnvVar = Environment.GetEnvironmentVariable("CORS_ALLOWED_ORIGINS");
