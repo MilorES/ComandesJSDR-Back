@@ -30,7 +30,7 @@ namespace ComandesAPI.Services
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
                 new Claim(ClaimTypes.Role, user.Role)
             };
 
@@ -78,10 +78,9 @@ namespace ComandesAPI.Services
 
                 return userId;
             }
-            catch (Exception ex)
+            catch
             {
                 // Token invàlid o expirat
-                // TODO: Log exception 'ex' as needed for debugging
                 return null;
             }
         }
