@@ -82,6 +82,8 @@ namespace ComandesAPI.Controllers
                 return BadRequest(new { message = "Dades d'entrada no vàlides", errors = ModelState });
             }
 
+            /*
+            // Tret, petició MillorIT que no es comprovi únic username i email
             // Verificar si el username ja existeix
             if (await _context.Usuaris.AnyAsync(u => u.Username == createDto.Username))
             {
@@ -93,6 +95,7 @@ namespace ComandesAPI.Controllers
             {
                 return Conflict(new { message = "L'email ja està en ús" });
             }
+            */
 
             // Crear el nou usuari
             var user = new Usuari
@@ -146,7 +149,8 @@ namespace ComandesAPI.Controllers
             {
                 user.FullName = updateDto.FullName;
             }
-
+            /*
+            // Tret, petició MillorIT que no es comprovi únic email
             if (!string.IsNullOrEmpty(updateDto.Email))
             {
                 // Verificar si el nou email ja està en ús per un altre usuari
@@ -156,7 +160,7 @@ namespace ComandesAPI.Controllers
                 }
                 user.Email = updateDto.Email;
             }
-
+            */
             if (!string.IsNullOrEmpty(updateDto.Role))
             {
                 user.Role = updateDto.Role;

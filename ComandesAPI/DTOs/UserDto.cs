@@ -29,11 +29,13 @@ namespace ComandesAPI.DTOs
         [MinLength(6, ErrorMessage = "La contrasenya ha de tenir almenys 6 caràcters")]
         public string Password { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "El nom complet és obligatori")]
+        //[Required(ErrorMessage = "El nom complet és obligatori")]
         [MaxLength(100, ErrorMessage = "El nom complet no pot superar els 100 caràcters")]
         public string FullName { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "L'email és obligatori")]
+        
+        //30/11/2025
+        //Peticioó MillorIT treure obligació de l'email.
+        //[Required(ErrorMessage = "L'email és obligatori")]
         [EmailAddress(ErrorMessage = "L'email no és vàlid")]
         [MaxLength(100, ErrorMessage = "L'email no pot superar els 100 caràcters")]
         public string Email { get; set; } = string.Empty;
