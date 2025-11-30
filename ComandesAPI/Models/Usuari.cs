@@ -17,14 +17,12 @@ namespace ComandesAPI.Models
         [Required]
         public string PasswordHash { get; set; } = string.Empty;
 
-        [Required]
         [MaxLength(100)]
-        public string FullName { get; set; } = string.Empty;
+        public string? FullName { get; set; }
 
-        [Required]
         [EmailAddress]
         [MaxLength(100)]
-        public string Email { get; set; } = string.Empty;
+        public string? Email { get; set; }
 
         [Required]
         [MaxLength(20)]

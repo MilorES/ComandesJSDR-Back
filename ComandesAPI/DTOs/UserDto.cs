@@ -9,8 +9,8 @@ namespace ComandesAPI.DTOs
     {
         public int Id { get; set; }
         public string Username { get; set; } = string.Empty;
-        public string FullName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
+        public string? FullName { get; set; }
+        public string? Email { get; set; }
         public string Role { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public bool IsEnabled { get; set; }
@@ -31,14 +31,14 @@ namespace ComandesAPI.DTOs
 
         //[Required(ErrorMessage = "El nom complet és obligatori")]
         [MaxLength(100, ErrorMessage = "El nom complet no pot superar els 100 caràcters")]
-        public string FullName { get; set; } = string.Empty;
-        
+        public string? FullName { get; set; }
+
         //30/11/2025
         //Peticioó MillorIT treure obligació de l'email.
         //[Required(ErrorMessage = "L'email és obligatori")]
         [EmailAddress(ErrorMessage = "L'email no és vàlid")]
         [MaxLength(100, ErrorMessage = "L'email no pot superar els 100 caràcters")]
-        public string Email { get; set; } = string.Empty;
+        public string? Email { get; set; }
 
         [Required(ErrorMessage = "El rol és obligatori")]
         [RegularExpression("^(User|Administrator)$", ErrorMessage = "El rol ha de ser 'User' o 'Administrator'")]
