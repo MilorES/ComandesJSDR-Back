@@ -118,7 +118,7 @@ namespace ComandesAPI.Controllers
         /// </summary>
         /// <returns>Resum de productes</returns>
         [HttpGet("productes/resum")]
-        [Authorize(Roles = "Administrator")]
+        //[Authorize(Roles = "Administrator")]
         public async Task<ActionResult<ResumProductesDto>> GetResumProductes()
         {
             try
@@ -152,7 +152,7 @@ namespace ComandesAPI.Controllers
         /// <param name="limit">Nombre de productes a retornar (per defecte 10)</param>
         /// <returns>Llista de productes novetat</returns>
         [HttpGet("productes/novetats")]
-        [Authorize(Roles = "Administrator")]
+        //[Authorize(Roles = "Administrator")]
         public async Task<ActionResult<IEnumerable<ArticleDto>>> GetProductesNovetat([FromQuery] int limit = 10)
         {
             try
@@ -196,7 +196,7 @@ namespace ComandesAPI.Controllers
         /// <param name="quantitat">Quantitat màxima d'estoc per considerar "baix stock" (per defecte 10)</param>
         /// <returns>Llista de productes amb baix stock</returns>
         [HttpGet("productes/baix-stock")]
-        [Authorize(Roles = "Administrator")]
+        //[Authorize(Roles = "Administrator")]
         public async Task<ActionResult<IEnumerable<ArticleDto>>> GetProductesBaixStock([FromQuery] int quantitat = 10)
         {
             try
@@ -239,7 +239,7 @@ namespace ComandesAPI.Controllers
         /// </summary>
         /// <returns>Llista de categories amb el nombre de productes</returns>
         [HttpGet("productes/per-categoria")]
-        [Authorize(Roles = "Administrator")]
+        //[Authorize(Roles = "Administrator")]
         public async Task<ActionResult<IEnumerable<ProductePerCategoriaDto>>> GetProductesPerCategoria()
         {
             try
