@@ -378,12 +378,13 @@ namespace ComandesAPI.Controllers
         }
 
         /// <summary>
-        /// Canvia l'estat d'una comanda
+        /// Canvia l'estat d'una comanda (només administradors)
         /// </summary>
         /// <param name="id">ID de la comanda</param>
         /// <param name="canviarEstatDto">Nou estat</param>
         /// <returns>Comanda actualitzada</returns>
         [HttpPatch("{id}/estat")]
+        [Authorize(Roles = "Administrator")]
         public async Task<ActionResult<ComandaDto>> CanviarEstat(int id, [FromBody] CanviarEstatComandaDto canviarEstatDto)
         {
             try
