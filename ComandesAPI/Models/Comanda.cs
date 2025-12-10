@@ -19,10 +19,9 @@ public class Comanda
     public string NumeroComanda { get; set; } = string.Empty;
 
     /// <summary>
-    /// FK a l'usuari que fa la comanda
+    /// FK a l'usuari que fa la comanda (nullable per permetre esborrar usuaris)
     /// </summary>
-    [Required]
-    public int UsuariId { get; set; }
+    public int? UsuariId { get; set; }
 
     /// <summary>
     /// Propietat de navegació a l'Usuari

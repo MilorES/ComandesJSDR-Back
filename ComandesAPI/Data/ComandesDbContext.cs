@@ -66,11 +66,11 @@ namespace ComandesAPI.Data
                 entity.Property(e => e.TotalAmbDescompte).HasColumnType("decimal(10,2)").IsRequired();
                 entity.Property(e => e.Actiu).IsRequired().HasDefaultValue(true);
 
-                // Relació amb Usuari
+                // Relació amb Usuari (SetNull per permetre esborrar usuaris mantenint les comandes)
                 entity.HasOne(e => e.Usuari)
                     .WithMany()
                     .HasForeignKey(e => e.UsuariId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.SetNull);
 
                 entity.HasIndex(e => e.NumeroComanda).IsUnique().HasDatabaseName("IX_Comandes_NumeroComanda");
                 entity.HasIndex(e => e.UsuariId).HasDatabaseName("IX_Comandes_UsuariId");

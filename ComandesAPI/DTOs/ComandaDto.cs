@@ -10,7 +10,7 @@ public class ComandaDto
 {
     public int Id { get; set; }
     public string NumeroComanda { get; set; } = string.Empty;
-    public int UsuariId { get; set; }
+    public int? UsuariId { get; set; }
     public EstatComanda Estat { get; set; }
     public DateTime DataCreacio { get; set; }
     public DateTime? DataModificacio { get; set; }
